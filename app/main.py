@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import init_db
 from app.routes import transfers, webhooks, reconciliation
-from app.routes import admin, onboarding, partner
+from app.routes import admin, onboarding, partner, prefunded
 from app.compliance.blocklist import reload_external_lists
 
 logging.basicConfig(
@@ -51,6 +51,7 @@ app.include_router(reconciliation.router)
 app.include_router(admin.router)
 app.include_router(onboarding.router)
 app.include_router(partner.router)
+app.include_router(prefunded.router)
 
 PUBLIC = Path(__file__).parent.parent / "public"
 if PUBLIC.exists():

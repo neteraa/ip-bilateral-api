@@ -117,6 +117,33 @@ class PartnerDocument(Base):
     uploaded_at    = Column(DateTime, default=datetime.utcnow)
 
 
+class PrefundedAccount(Base):
+    __tablename__ = "prefunded_accounts"
+
+    id              = Column(Integer, primary_key=True, autoincrement=True)
+    ispb            = Column(String(8),   unique=True, nullable=False, index=True)
+    currency        = Column(String(3),   nullable=False, default="USD")
+    balance         = Column(Numeric(18, 2), nullable=False, default=0)
+    min_balance     = Column(Numeric(18, 2), nullable=False, default=1000)
+    created_at      = Column(DateTime, default=datetime.utcnow)
+    updated_at      = Column(DateTime, nullable=True)
+
+
+class PrefundedTransaction(Base):
+    __tablename__ = "prefunded_transactions"
+
+    id           = Column(Integer, primary_key=True, autoincrement=True)
+    ispb         = Column(String(8),   nullable=False, index=True)
+    type         = Column(String(20),  nullable=False)   # TOPUP | DEBIT | CREDIT | REVERSAL
+    amount       = Column(Numeric(18, 2), nullable=False)
+    balance_after= Column(Numeric(18, 2), nullable=False)
+    currency     = Column(String(3),   nullable=False, default="USD")
+    transfer_id  = Column(String(36),  nullable=True)
+    description  = Column(String(255), nullable=True)
+    created_by   = Column(String(100), default="system")
+    created_at   = Column(DateTime, default=datetime.utcnow)
+
+
 class TransferLimitConfig(Base):
     __tablename__ = "transfer_limits"
 
