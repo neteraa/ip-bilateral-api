@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ip-bilateral-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: THIS_ISPB
+        value: 00000000
+      - key: THIS_NAME
+        value: IP Bilateral Network
+      - key: API_KEY_ID
+        value: minha_key_id
+      - key: API_SECRET
+        generateValue: true
+      - key: ADMIN_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./bilateral.db
+      - key: PEER_WEBHOOK_URL
+        value: https://placeholder.com/webhooks

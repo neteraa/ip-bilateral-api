@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>IP Bilateral — Partner Review Admin</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+  .topbar{background:#1a1f2e;border-bottom:1px solid #1e2a3a;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+  .topbar-left{display:flex;align-items:center;gap:12px}
+  .logo{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+  .logo span{color:#60a5fa}
+  .badge-admin{background:#1e3a5f;color:#60a5fa;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px}
+  .key-input{background:#0f1117;border:1px solid #2d3a4a;border-radius:8px;padding:6px 12px;color:#e2e8f0;font-size:13px;width:220px;outline:none}
+  .key-input:focus{border-color:#3b82f6}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+  .btn-sm{padding:5px 12px;font-size:12px}
+  .btn-blue{background:#1e3a5f;color:#60a5fa}
+  .btn-blue:hover{background:#2a4a7f}
+  .btn-green{background:#14532d;color:#4ade80}
+  .btn-green:hover{background:#166534}
+  .btn-red{background:#450a0a;color:#f87171}
+  .btn-red:hover{background:#7f1d1d}
+  .btn-yellow{background:#422006;color:#fbbf24}
+  .btn-yellow:hover{background:#713f12}
+  .btn-gray{background:#1e2a3a;color:#94a3b8}
+  .btn-gray:hover{background:#2d3a4a}
+  .layout{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 56px)}
+  @media(max-width:768px){.layout{grid-template-columns:1fr;height:auto}}
+  .sidebar{border-right:1px solid #1e2a3a;overflow-y:auto;background:#141820}
+  .sidebar-header{padding:16px;border-bottom:1px solid #1e2a3a;display:flex;align-items:center;justify-content:space-between}
+  .sidebar-header h2{font-size:14px;font-weight:700;color:#e2e8f0}
+  .filters{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid #1e2a3a;flex-wrap:wrap}
+  .filter-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #2d3a4a;background:transparent;color:#64748b;transition:all .2s}
+  .filter-btn.active{background:#1e3a5f;border-color:#3b82f6;color:#60a5fa}
+  .sub-list{padding:8px}
+  .sub-item{padding:12px;border-radius:10px;cursor:pointer;border:1px solid transparent;margin-bottom:6px;transition:all .2s}
+  .sub-item:hover{background:#1e2a3a}
+  .sub-item.active{background:#1a2540;border-color:#2d4a7a}
+  .sub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .sub-name{font-size:13px;font-weight:600;color:#e2e8f0}
+  .status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+  .s-PENDING{background:#1c2a1c;color:#86efac}
+  .s-UNDER_REVIEW{background:#1c1c2a;color:#a78bfa}
+  .s-APPROVED{background:#14532d;color:#4ade80}
+  .s-REJECTED{background:#450a0a;color:#f87171}
+  .sub-meta{font-size:11px;color:#475569}
+  .sub-country{font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;margin-top:3px}
+  .detail{overflow-y:auto;padding:24px}
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#475569;gap:12px}
+  .empty-state .ei{font-size:40px}
+  .detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+  .detail-title{font-size:20px;font-weight:800;color:#fff}
+  .detail-ref{font-size:13px;color:#64748b;margin-top:2px;font-family:monospace}
+  .action-row{display:flex;gap:8px;flex-wrap:wrap}
+  .section{background:#1a1f2e;border:1px solid #1e2a3a;border-radius:12px;padding:20px;margin-bottom:16px}
+  .section-title{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+  .kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:900px){.kv-grid{grid-template-columns:1fr}}
+  .kv{display:flex;flex-direction:column;gap:3px}
+  .kv-label{font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:.4px}
+  .kv-val{font-size:13px;color:#e2e8f0;word-break:break-all}
+  .kv-val a{color:#60a5fa;text-decoration:none}
+  .kv-val a:hover{text-decoration:underline}
+  .kv-val.mono{font-family:monospace;font-size:12px;color:#94a3b8}
+  .kv-val.empty{color:#475569;font-style:italic}
+  .doc-grid{display:flex;flex-direction:column;gap:8px}
+  .doc-card{background:#0f1117;border:1px solid #2d3a4a;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .doc-left{display:flex;align-items:center;gap:10px}
+  .doc-type-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1e2a3a;color:#94a3b8;white-space:nowrap}
+  .doc-type-badge.verified{background:#14532d;color:#4ade80}
+  .doc-filename{font-size:13px;color:#e2e8f0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .doc-hash{font-size:10px;color:#475569;font-family:monospace;margin-top:2px}
+  .doc-actions{display:flex;gap:6px}
+  .review-section{background:#1a2540;border:1px solid #2d4a7a;border-radius:12px;padding:20px;margin-bottom:16px}
+  .review-section h3{font-size:14px;font-weight:700;color:#93c5fd;margin-bottom:14px}
+  .review-section textarea{width:100%;background:#0f1117;border:1px solid #2d3a4a;border-radius:8px;padding:10px;color:#e2e8f0;font-size:13px;resize:vertical;min-height:80px;outline:none}
+  .review-section textarea:focus{border-color:#3b82f6}
+  .review-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #toast{position:fixed;bottom:24px;right:24px;background:#1a1f2e;border:1px solid #2d3a4a;border-radius:10px;padding:12px 18px;font-size:13px;color:#e2e8f0;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:all .3s;opacity:0;pointer-events:none;z-index:999}
+  #toast.show{opacity:1}
+  #toast.err{border-color:#ef4444;color:#fca5a5}
+  #toast.ok{border-color:#22c55e;color:#86efac}
+  .count-bubble{background:#3b82f6;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo"><span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:6px;padding:2px 8px;font-size:12px;color:#fff">IP</span> Bilateral <span>Admin</span></div>
+    <span class="badge-admin">PARTNER REVIEW</span>
+  </div>
+    <div style="display:flex;align-items:center;gap:8px">
+    <input class="key-input" id="adminKey" type="password" placeholder="X-Admin-Key…" onkeydown="if(event.key==='Enter')loadSubmissions()"/>
+    <button class="btn btn-blue" onclick="loadSubmissions()">🔓 Load</button>
+    <a href="https://ip-bilateral-api-production.up.railway.app/docs" target="_blank" class="btn btn-gray" style="font-size:12px">API Docs ↗</a>
+    <a href="https://ip-partner-onboarding.netlify.app" target="_blank" class="btn btn-gray" style="font-size:12px">Partner Portal ↗</a>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar: list -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Submissions <span id="countBubble" class="count-bubble" style="display:none"></span></h2>
+      <button class="btn btn-gray btn-sm" onclick="loadSubmissions()">↻ Refresh</button>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter(this,'')">All</button>
+      <button class="filter-btn" onclick="setFilter(this,'PENDING')">Pending</button>
+      <button class="filter-btn" onclick="setFilter(this,'UNDER_REVIEW')">Reviewing</button>
+      <button class="filter-btn" onclick="setFilter(this,'APPROVED')">Approved</button>
+      <button class="filter-btn" onclick="setFilter(this,'REJECTED')">Rejected</button>
+    </div>
+    <div class="sub-list" id="subList">
+      <div style="text-align:center;padding:40px 16px;color:#475569;font-size:13px">Enter admin key and click Load</div>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="detail" id="detailPanel">
+    <div class="empty-state">
+      <div class="ei">📋</div>
+      <div style="font-size:14px;font-weight:600">Select a submission to review</div>
+      <div style="font-size:13px">Partner applications will appear here</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://ip-bilateral-api-production.up.railway.app';
+let currentFilter = '';
+let submissions = [];
+let currentRef = null;
+
+function adminKey() { return document.getElementById('adminKey').value.trim(); }
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3500);
+}
+
+function setFilter(btn, f) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = f;
+  renderList();
+}
+
+async function loadSubmissions() {
+  if (!adminKey()) { toast('Enter admin key first', 'err'); return; }
+  const url = API + '/partner/submissions' + (currentFilter ? `?status_filter=${currentFilter}` : '');
+  try {
+    const res = await fetch(url, { headers: {'X-Admin-Key': adminKey()} });
+    if (res.status === 403) { toast('Invalid admin key', 'err'); return; }
+    submissions = await res.json();
+    renderList();
+    const b = document.getElementById('countBubble');
+    b.textContent = submissions.length; b.style.display = 'inline';
+    if (currentRef) loadDetail(currentRef);
+  } catch(e) { toast('Connection error', 'err'); }
+}
+
+function renderList() {
+  const list = document.getElementById('subList');
+  const filtered = currentFilter ? submissions.filter(s => s.status === currentFilter) : submissions;
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#475569;font-size:13px">No submissions found</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(s => `
+    <div class="sub-item ${currentRef===s.reference_code?'active':''}" onclick="loadDetail('${s.reference_code}')">
+      <div class="sub-top">
+        <div class="sub-name">${s.institution_name}</div>
+        <span class="status-badge s-${s.status}">${s.status.replace('_',' ')}</span>
+      </div>
+      <div class="sub-meta">${s.reference_code} · ${s.contact_email}</div>
+      <div class="sub-country">🌍 ${s.country} · ${s.regulator}</div>
+    </div>`).join('');
+}
+
+async function loadDetail(ref) {
+  currentRef = ref;
+  renderList();
+  document.getElementById('detailPanel').innerHTML = '<div style="padding:40px;text-align:center;color:#475569"><span class="spinner"></span></div>';
+  try {
+    const res = await fetch(API + `/partner/submissions/${ref}`, { headers:{'X-Admin-Key':adminKey()} });
+    const s = await res.json();
+    renderDetail(s);
+  } catch(e) { toast('Failed to load detail', 'err'); }
+}
+
+function val(v) {
+  if (!v) return '<span class="kv-val empty">—</span>';
+  if (v.startsWith('http')) return `<span class="kv-val"><a href="${v}" target="_blank">${v}</a></span>`;
+  return `<span class="kv-val">${v}</span>`;
+}
+
+function renderDetail(s) {
+  const docsHtml = s.documents.length === 0
+    ? '<div style="color:#475569;font-size:13px;padding:8px 0">No documents uploaded yet</div>'
+    : s.documents.map(d => `
+      <div class="doc-card">
+        <div class="doc-left">
+          <span class="doc-type-badge ${d.verified?'verified':''}">${d.verified?'✓ ':''}${d.doc_type}</span>
+          <div>
+            <div class="doc-filename">${d.filename}</div>
+            <div class="doc-hash">SHA-256: ${d.sha256.substring(0,32)}…</div>
+          </div>
+          <div style="font-size:11px;color:#475569">${d.size_kb} KB</div>
+        </div>
+        <div class="doc-actions">
+          ${!d.verified ? `<button class="btn btn-green btn-sm" onclick="verifyDoc(${d.doc_id})">✓ Verify</button>` : '<span style="color:#4ade80;font-size:12px">✓ Verified</span>'}
+          <a href="${API}${d.download_url}" target="_blank" class="btn btn-gray btn-sm">⬇ Download</a>
+        </div>
+      </div>`).join('');
+
+  const reviewerHtml = s.reviewed_at ? `
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 14px;background:#0f1117;border-radius:8px;border:1px solid #2d3a4a">
+      <span style="font-size:16px">📝</span>
+      <div>
+        <div style="font-size:12px;color:#64748b">${s.reviewed_by} · ${new Date(s.reviewed_at).toLocaleString()}</div>
+        <div style="font-size:13px;color:#e2e8f0;margin-top:2px">${s.reviewer_comment || 'No comment'}</div>
+      </div>
+    </div>` : '';
+
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-header">
+      <div>
+        <div class="detail-title">${s.institution_name}</div>
+        <div class="detail-ref">REF: ${s.reference_code}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="status-badge s-${s.status}" style="font-size:12px;padding:4px 10px">${s.status.replace('_',' ')}</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🏛️ Institution</div>
+      <div class="kv-grid">
+        <div class="kv"><div class="kv-label">Country</div>${val(s.country)}</div>
+        <div class="kv"><div class="kv-label">Regulator</div>${val(s.regulator)}</div>
+        <div class="kv"><div class="kv-label">License Number</div>${val(s.license_number)}</div>
+        <div class="kv"><div class="kv-label">LEI Code</div><span class="kv-val mono">${s.lei_code||'—'}</span></div>
+        <div class="kv"><div class="kv-label">SWIFT / BIC</div><span class="kv-val mono">${s.swift_bic||'—'}</span></div>
+        <div class="kv"><div class="kv-label">Website</div>${val(s.website)}</div>
+        <div class="kv" style="grid-column:1/-1"><div class="kv-label">API Endpoint</div><span class="kv-val mono">${s.api_endpoint||'—'}</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">👤 Contact</div>
+      <div class="kv-grid">
+        <div class="kv"><div class="kv-label">Name</div>${val(s.contact_name)}</div>
+        <div class="kv"><div class="kv-label">Email</div>${val(s.contact_email)}</div>
+        <div class="kv"><div class="kv-label">Phone</div>${val(s.contact_phone)}</div>
+        <div class="kv"><div class="kv-label">Submitted</div><span class="kv-val">${new Date(s.created_at).toLocaleString()}</span></div>
+      </div>
+      ${s.notes ? `<div style="margin-top:12px;padding:10px;background:#0f1117;border-radius:8px;font-size:13px;color:#94a3b8">${s.notes}</div>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="section-title">📄 Documents <span style="font-size:11px;color:#475569;text-transform:none">(${s.documents.length} uploaded)</span></div>
+      <div class="doc-grid">${docsHtml}</div>
+    </div>
+
+    ${reviewerHtml}
+
+    <div class="review-section">
+      <h3>🔍 Review Decision</h3>
+      <textarea id="reviewComment" placeholder="Add your compliance notes, reasons for approval/rejection, or requests for additional information…"></textarea>
+      <div class="review-btns">
+        <button class="btn btn-green" onclick="makeDecision('APPROVED')">✅ Approve</button>
+        <button class="btn btn-red" onclick="makeDecision('REJECTED')">❌ Reject</button>
+        <button class="btn btn-yellow" onclick="makeDecision('UNDER_REVIEW')">🔍 Mark Under Review</button>
+      </div>
+    </div>
+  `;
+}
+
+async function makeDecision(decision) {
+  const comment = document.getElementById('reviewComment')?.value || '';
+  const fd = new FormData();
+  fd.append('decision', decision);
+  if (comment) fd.append('comment', comment);
+  try {
+    const res = await fetch(API + `/partner/submissions/${currentRef}/review`, {
+      method: 'PATCH',
+      headers: {'X-Admin-Key': adminKey()},
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    toast(`${currentRef} → ${decision}`, 'ok');
+    await loadSubmissions();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function verifyDoc(docId) {
+  try {
+    const res = await fetch(API + `/partner/documents/${docId}/verify`, {
+      method: 'PATCH',
+      headers: {'X-Admin-Key': adminKey()},
+    });
+    if (!res.ok) throw new Error('Verify failed');
+    toast('Document verified ✓', 'ok');
+    loadDetail(currentRef);
+  } catch(e) { toast(e.message, 'err'); }
+}
+</script>
+</body>
+</html>

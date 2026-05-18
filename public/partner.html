@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Partner Institution Onboarding</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+  .hero{background:linear-gradient(135deg,#1a1f2e 0%,#0f1117 60%);border-bottom:1px solid #1e2a3a;padding:40px 24px 32px}
+  .hero-inner{max-width:760px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .logo-text{font-size:18px;font-weight:700;color:#fff}
+  .logo-sub{font-size:12px;color:#64748b;margin-top:2px}
+  h1{font-size:28px;font-weight:800;color:#fff;line-height:1.2}
+  h1 span{background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .hero p{margin-top:10px;color:#94a3b8;font-size:15px;max-width:560px}
+  .steps{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+  .step{display:flex;align-items:center;gap:6px;background:#1e2a3a;border:1px solid #2d3a4a;border-radius:20px;padding:5px 12px;font-size:12px;color:#94a3b8}
+  .step-n{width:18px;height:18px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+  .container{max-width:760px;margin:0 auto;padding:32px 24px}
+  .card{background:#1a1f2e;border:1px solid #1e2a3a;border-radius:16px;padding:28px;margin-bottom:24px}
+  .card-title{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card-title .badge{font-size:10px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:2px 7px;font-weight:600}
+  .card-sub{font-size:13px;color:#64748b;margin-bottom:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:540px){.grid2{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+  .field label .req{color:#ef4444;margin-left:2px}
+  .field input,.field select,.field textarea{background:#0f1117;border:1px solid #2d3a4a;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;transition:border-color .2s;outline:none;width:100%}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#3b82f6}
+  .field textarea{resize:vertical;min-height:80px}
+  .field select option{background:#1a1f2e}
+  .upload-zone{border:2px dashed #2d3a4a;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+  .upload-zone:hover,.upload-zone.drag{border-color:#3b82f6;background:#1e2a3a}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .upload-zone .uz-icon{font-size:28px;margin-bottom:6px}
+  .upload-zone .uz-label{font-size:13px;color:#94a3b8}
+  .upload-zone .uz-hint{font-size:11px;color:#475569;margin-top:4px}
+  .doc-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .doc-item{display:flex;align-items:center;justify-content:space-between;background:#0f1117;border:1px solid #2d3a4a;border-radius:8px;padding:10px 14px}
+  .doc-item .doc-info{display:flex;align-items:center;gap:10px}
+  .doc-badge{font-size:10px;font-weight:700;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:2px 7px;white-space:nowrap}
+  .doc-name{font-size:13px;color:#e2e8f0;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .doc-size{font-size:11px;color:#64748b}
+  .doc-remove{background:none;border:none;color:#475569;cursor:pointer;font-size:16px;padding:0 4px}
+  .doc-remove:hover{color:#ef4444}
+  .doc-type-sel{background:#0f1117;border:1px solid #2d3a4a;border-radius:6px;padding:4px 8px;color:#e2e8f0;font-size:12px;cursor:pointer}
+  .req-docs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+  @media(max-width:540px){.req-docs{grid-template-columns:1fr}}
+  .req-doc{display:flex;align-items:center;gap:8px;background:#0f1117;border:1px solid #2d3a4a;border-radius:8px;padding:8px 12px;font-size:12px;color:#94a3b8}
+  .req-doc.done{border-color:#166534;color:#4ade80}
+  .req-doc .rd-icon{font-size:16px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+  .btn-primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff}
+  .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-outline{background:transparent;border:1px solid #2d3a4a;color:#94a3b8}
+  .btn-outline:hover{border-color:#3b82f6;color:#60a5fa}
+  .actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:8px}
+  .notice{display:flex;gap:10px;background:#0f1b2d;border:1px solid #1e3a5f;border-radius:10px;padding:14px 16px;font-size:13px;color:#7dd3fc;margin-bottom:20px}
+  .notice .ni{font-size:18px;flex-shrink:0}
+  /* success screen */
+  .success{text-align:center;padding:48px 24px}
+  .success .s-icon{font-size:56px;margin-bottom:16px}
+  .success h2{font-size:24px;font-weight:800;color:#fff;margin-bottom:8px}
+  .success p{color:#94a3b8;margin-bottom:24px}
+  .ref-box{display:inline-block;background:#0f1117;border:2px solid #3b82f6;border-radius:12px;padding:14px 28px;font-size:28px;font-weight:900;letter-spacing:3px;color:#60a5fa;margin-bottom:24px;cursor:pointer;transition:opacity .2s}
+  .ref-box:hover{opacity:.8}
+  .ref-hint{font-size:12px;color:#64748b;margin-bottom:32px}
+  /* progress */
+  .progress-bar{height:4px;background:#1e2a3a;border-radius:2px;margin-bottom:28px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#8b5cf6);border-radius:2px;transition:width .4s}
+  /* toast */
+  #toast{position:fixed;bottom:24px;right:24px;background:#1a1f2e;border:1px solid #2d3a4a;border-radius:10px;padding:12px 18px;font-size:13px;color:#e2e8f0;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:all .3s;opacity:0;pointer-events:none;z-index:999;max-width:320px}
+  #toast.show{opacity:1;pointer-events:auto}
+  #toast.err{border-color:#ef4444;color:#fca5a5}
+  #toast.ok{border-color:#22c55e;color:#86efac}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="logo">
+      <div class="logo-icon">🏦</div>
+      <div>
+        <div class="logo-text">IP Bilateral Network</div>
+        <div class="logo-sub">Institutional Partner Onboarding</div>
+      </div>
+    </div>
+    <h1>Connect your institution<br>to our <span>bilateral network</span></h1>
+    <p>Submit your institution details and required documents. Our compliance team will review and issue API credentials within 2–5 business days.</p>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div>Institution details</div>
+      <div class="step"><div class="step-n">2</div>Document upload</div>
+      <div class="step"><div class="step-n">3</div>Compliance review</div>
+      <div class="step"><div class="step-n">4</div>API credentials issued</div>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="mainForm">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="notice">
+    <span class="ni">🔒</span>
+    <span>All submitted information is encrypted and stored securely. Documents are hashed with SHA-256 upon upload.</span>
+  </div>
+
+  <!-- STEP 1: Institution -->
+  <div class="card" id="step1">
+    <div class="card-title">🏛️ Institution Information <span class="badge">REQUIRED</span></div>
+    <div class="card-sub">Provide the official details of your payment institution.</div>
+    <div class="grid2" style="gap:16px;display:grid;grid-template-columns:1fr 1fr">
+      <div class="field" style="grid-column:1/-1">
+        <label>Institution Legal Name <span class="req">*</span></label>
+        <input id="institution_name" placeholder="e.g. Al Fardan Exchange LLC" required/>
+      </div>
+      <div class="field">
+        <label>Country of Incorporation <span class="req">*</span></label>
+        <select id="country">
+          <option value="">— Select country —</option>
+          <option>United Arab Emirates</option>
+          <option>Saudi Arabia</option>
+          <option>Qatar</option>
+          <option>Kuwait</option>
+          <option>Bahrain</option>
+          <option>Oman</option>
+          <option>United Kingdom</option>
+          <option>Singapore</option>
+          <option>Brazil</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Regulator / Authority <span class="req">*</span></label>
+        <select id="regulator">
+          <option value="">— Select regulator —</option>
+          <option>CBUAE (Central Bank UAE)</option>
+          <option>DFSA (Dubai Financial Services Authority)</option>
+          <option>FSRA (Abu Dhabi — ADGM)</option>
+          <option>SAMA (Saudi Arabia)</option>
+          <option>QCB (Qatar)</option>
+          <option>CBK (Kuwait)</option>
+          <option>CBB (Bahrain)</option>
+          <option>FCA (United Kingdom)</option>
+          <option>MAS (Singapore)</option>
+          <option>BCB (Brazil)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>License / Registration Number <span class="req">*</span></label>
+        <input id="license_number" placeholder="e.g. PI-2024-00123"/>
+      </div>
+      <div class="field">
+        <label>LEI Code <span style="color:#64748b;font-size:10px">(optional but recommended)</span></label>
+        <input id="lei_code" placeholder="20-char LEI — e.g. 213800WAKPL..."/>
+      </div>
+      <div class="field">
+        <label>SWIFT / BIC Code</label>
+        <input id="swift_bic" placeholder="e.g. ALDBUAEAXXX"/>
+      </div>
+      <div class="field">
+        <label>Institution Website</label>
+        <input id="website" placeholder="https://"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Contact -->
+  <div class="card" id="step2">
+    <div class="card-title">👤 Legal Representative / Contact <span class="badge">REQUIRED</span></div>
+    <div class="card-sub">Primary point of contact for compliance and technical integration.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="field">
+        <label>Full Name <span class="req">*</span></label>
+        <input id="contact_name" placeholder="Full legal name"/>
+      </div>
+      <div class="field">
+        <label>Email Address <span class="req">*</span></label>
+        <input id="contact_email" type="email" placeholder="compliance@institution.com"/>
+      </div>
+      <div class="field">
+        <label>Phone (with country code)</label>
+        <input id="contact_phone" placeholder="+971 50 000 0000"/>
+      </div>
+      <div class="field">
+        <label>API Endpoint URL <span style="color:#64748b;font-size:10px">(if already available)</span></label>
+        <input id="api_endpoint" placeholder="https://api.institution.com/bilateral"/>
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label>Additional Notes</label>
+        <textarea id="notes" placeholder="Any additional information, special requirements, or context..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Documents -->
+  <div class="card" id="step3">
+    <div class="card-title">📄 Required Documents <span class="badge">UPLOAD</span></div>
+    <div class="card-sub">Upload the following documents. Accepted formats: PDF, PNG, JPG, DOCX — max 20MB each.</div>
+
+    <div class="req-docs" id="reqDocs">
+      <div class="req-doc" data-type="LICENSE" id="rd-LICENSE"><span class="rd-icon">⬜</span>Regulatory License</div>
+      <div class="req-doc" data-type="LEI" id="rd-LEI"><span class="rd-icon">⬜</span>LEI Certificate</div>
+      <div class="req-doc" data-type="INCORPORATION" id="rd-INCORPORATION"><span class="rd-icon">⬜</span>Certificate of Incorporation</div>
+      <div class="req-doc" data-type="ID_LEGAL_REP" id="rd-ID_LEGAL_REP"><span class="rd-icon">⬜</span>Legal Rep. ID / Passport</div>
+      <div class="req-doc" data-type="BANK_PROOF" id="rd-BANK_PROOF"><span class="rd-icon">⬜</span>Bank Account Proof / IBAN</div>
+      <div class="req-doc" data-type="NDA" id="rd-NDA"><span class="rd-icon">⬜</span>Signed NDA</div>
+    </div>
+
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" multiple accept=".pdf,.png,.jpg,.jpeg,.docx"/>
+      <div class="uz-icon">📎</div>
+      <div class="uz-label">Drop files here or click to browse</div>
+      <div class="uz-hint">PDF, PNG, JPG, DOCX — max 20MB each</div>
+    </div>
+    <div class="doc-list" id="docList"></div>
+  </div>
+
+  <div class="actions">
+    <div style="font-size:13px;color:#64748b">All fields marked <span style="color:#ef4444">*</span> are required</div>
+    <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+      Submit Application &nbsp;→
+    </button>
+  </div>
+</div>
+
+<!-- Success screen -->
+<div class="container" id="successScreen" style="display:none">
+  <div class="success">
+    <div class="s-icon">✅</div>
+    <h2>Application Submitted!</h2>
+    <p>Your institution details and documents have been received.<br>Our compliance team will review within <strong>2–5 business days</strong>.</p>
+    <div class="ref-box" id="refCodeDisplay" onclick="copyRef()" title="Click to copy"></div>
+    <div class="ref-hint">👆 Click the code to copy — keep it to track your application status</div>
+    <p style="color:#64748b;font-size:13px">You will be contacted at <strong id="refEmail"></strong> with the outcome.</p>
+    <div style="margin-top:32px;padding:20px;background:#1a1f2e;border:1px solid #1e2a3a;border-radius:12px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto">
+      <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:12px">NEXT STEPS</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:#64748b">
+        <div>📋 &nbsp;Compliance team reviews documents & performs KYC/AML checks</div>
+        <div>✉️ &nbsp;You receive approval email with API credentials</div>
+        <div>🔐 &nbsp;Configure HMAC signing with your issued key pair</div>
+        <div>🔗 &nbsp;Run test transfers in sandbox mode</div>
+        <div>🚀 &nbsp;Go live on bilateral network</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = '';
+let pendingFiles = []; // {file, docType}
+let refCode = null;
+
+// ── drag & drop
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
+  handleFiles([...e.dataTransfer.files]);
+});
+document.getElementById('fileInput').addEventListener('change', e => handleFiles([...e.target.files]));
+
+function handleFiles(files) {
+  files.forEach(f => {
+    if (f.size > 20 * 1024 * 1024) { toast('File too large: ' + f.name, 'err'); return; }
+    pendingFiles.push({ file: f, docType: guessDocType(f.name) });
+  });
+  renderDocList();
+  updateProgress();
+}
+
+function guessDocType(name) {
+  const n = name.toLowerCase();
+  if (n.includes('license') || n.includes('licence')) return 'LICENSE';
+  if (n.includes('lei')) return 'LEI';
+  if (n.includes('incorp') || n.includes('certificate')) return 'INCORPORATION';
+  if (n.includes('passport') || n.includes('id') || n.includes('representative')) return 'ID_LEGAL_REP';
+  if (n.includes('bank') || n.includes('iban') || n.includes('account')) return 'BANK_PROOF';
+  if (n.includes('nda') || n.includes('agreement')) return 'NDA';
+  return 'OTHER';
+}
+
+function renderDocList() {
+  const list = document.getElementById('docList');
+  list.innerHTML = '';
+  pendingFiles.forEach((pf, i) => {
+    const size = pf.file.size < 1024 ? pf.file.size + ' B'
+               : pf.file.size < 1024*1024 ? (pf.file.size/1024).toFixed(1) + ' KB'
+               : (pf.file.size/1024/1024).toFixed(1) + ' MB';
+    list.innerHTML += `
+      <div class="doc-item">
+        <div class="doc-info">
+          <select class="doc-type-sel" onchange="pendingFiles[${i}].docType=this.value;updateRequiredDocs()">
+            ${['LICENSE','LEI','INCORPORATION','ID_LEGAL_REP','BANK_PROOF','NDA','OTHER']
+              .map(t => `<option value="${t}" ${t===pf.docType?'selected':''}>${t}</option>`).join('')}
+          </select>
+          <div>
+            <div class="doc-name">${pf.file.name}</div>
+            <div class="doc-size">${size}</div>
+          </div>
+        </div>
+        <button class="doc-remove" onclick="removeFile(${i})">✕</button>
+      </div>`;
+  });
+  updateRequiredDocs();
+}
+
+function removeFile(i) { pendingFiles.splice(i,1); renderDocList(); updateProgress(); }
+
+function updateRequiredDocs() {
+  const types = new Set(pendingFiles.map(f => f.docType));
+  ['LICENSE','LEI','INCORPORATION','ID_LEGAL_REP','BANK_PROOF','NDA'].forEach(t => {
+    const el = document.getElementById('rd-'+t);
+    if (types.has(t)) {
+      el.classList.add('done');
+      el.querySelector('.rd-icon').textContent = '✅';
+    } else {
+      el.classList.remove('done');
+      el.querySelector('.rd-icon').textContent = '⬜';
+    }
+  });
+}
+
+function updateProgress() {
+  const fields = ['institution_name','country','regulator','license_number','contact_name','contact_email'];
+  const filled = fields.filter(f => document.getElementById(f)?.value?.trim()).length;
+  const hasDocs = pendingFiles.length > 0 ? 1 : 0;
+  const pct = Math.round((filled / fields.length) * 70 + hasDocs * 30);
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+['institution_name','country','regulator','license_number','contact_name','contact_email'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateProgress);
+});
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3500);
+}
+
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+
+  // Validate required
+  const req = { institution_name:'Institution name', country:'Country', regulator:'Regulator',
+                license_number:'License number', contact_name:'Contact name', contact_email:'Email' };
+  for (const [id, label] of Object.entries(req)) {
+    if (!document.getElementById(id).value.trim()) {
+      toast(`${label} is required`, 'err'); return;
+    }
+  }
+  if (pendingFiles.length === 0) { toast('Please upload at least one document', 'err'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+  // Step 1: Submit institution data
+  try {
+    const fd = new FormData();
+    ['institution_name','country','regulator','license_number','lei_code','swift_bic',
+     'contact_name','contact_email','contact_phone','website','api_endpoint','notes'].forEach(f => {
+      const v = document.getElementById(f)?.value?.trim();
+      if (v) fd.append(f, v);
+    });
+
+    const res = await fetch(API + '/partner/submit', { method:'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Submit failed');
+    refCode = data.reference_code;
+
+    // Step 2: Upload documents
+    for (const pf of pendingFiles) {
+      const dfd = new FormData();
+      dfd.append('doc_type', pf.docType);
+      dfd.append('file', pf.file);
+      const dr = await fetch(API + `/partner/${refCode}/documents`, { method:'POST', body: dfd });
+      if (!dr.ok) {
+        const de = await dr.json();
+        console.warn('Doc upload warn:', de.detail);
+      }
+    }
+
+    // Show success
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('refCodeDisplay').textContent = refCode;
+    document.getElementById('refEmail').textContent = document.getElementById('contact_email').value;
+
+  } catch(e) {
+    toast(e.message, 'err');
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Application &nbsp;→';
+  }
+}
+
+function copyRef() {
+  navigator.clipboard.writeText(refCode).then(() => toast('Reference code copied!', 'ok'));
+}
+</script>
+</body>
+</html>

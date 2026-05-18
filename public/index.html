@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>IP Bilateral Network — API</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0}
+  .topbar{background:#1a1f2e;border-bottom:1px solid #1e2a3a;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-badge{background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:800;color:#fff}
+  .logo-text{font-size:16px;font-weight:700;color:#fff}
+  .logo-sub{font-size:11px;color:#64748b}
+  .status-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .hero{padding:60px 32px 40px;max-width:1100px;margin:0 auto}
+  h1{font-size:36px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:12px}
+  h1 span{background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .hero-desc{color:#94a3b8;font-size:16px;max-width:600px;margin-bottom:32px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1100px;margin:0 auto;padding:0 32px 40px}
+  @media(max-width:768px){.cards{grid-template-columns:1fr}}
+  .card{background:#1a1f2e;border:1px solid #1e2a3a;border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:all .2s;display:block}
+  .card:hover{border-color:#3b82f6;transform:translateY(-2px)}
+  .card-icon{font-size:28px;margin-bottom:12px}
+  .card-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px}
+  .card-desc{font-size:13px;color:#64748b;margin-bottom:16px}
+  .card-link{font-size:12px;color:#60a5fa;font-weight:600}
+  .section{max-width:1100px;margin:0 auto;padding:0 32px 48px}
+  .section-title{font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+  .endpoint-list{display:flex;flex-direction:column;gap:10px}
+  .endpoint{display:flex;align-items:flex-start;gap:12px;background:#1a1f2e;border:1px solid #1e2a3a;border-radius:10px;padding:14px 18px}
+  .method{font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+  .m-GET{background:#14532d;color:#4ade80}
+  .m-POST{background:#1e3a5f;color:#60a5fa}
+  .m-PATCH{background:#422006;color:#fbbf24}
+  .m-DELETE{background:#450a0a;color:#f87171}
+  .ep-path{font-size:13px;font-weight:600;color:#e2e8f0;font-family:monospace}
+  .ep-desc{font-size:12px;color:#64748b;margin-top:2px}
+  .ep-auth{font-size:10px;padding:1px 6px;border-radius:4px;margin-left:8px;font-weight:700}
+  .auth-hmac{background:#1a2540;color:#93c5fd}
+  .auth-admin{background:#2d1a40;color:#c4b5fd}
+  .auth-pub{background:#141a14;color:#86efac}
+  pre{background:#0a0d14;border:1px solid #1e2a3a;border-radius:10px;padding:16px 20px;font-size:12px;color:#94a3b8;overflow-x:auto;line-height:1.6;tab-size:2}
+  pre .k{color:#60a5fa}
+  pre .s{color:#86efac}
+  pre .n{color:#fbbf24}
+  pre .c{color:#475569}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:768px){.grid2{grid-template-columns:1fr}}
+  .tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:#1e2a3a;color:#64748b;margin-left:6px}
+  .divider{border:none;border-top:1px solid #1e2a3a;margin:0 32px 40px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-badge">IP</div>
+    <div>
+      <div class="logo-text">IP Bilateral Network</div>
+      <div class="logo-sub">Instituição de Pagamento — Bilateral API</div>
+    </div>
+  </div>
+  <div style="font-size:13px;color:#64748b">
+    <span class="status-dot"></span>API Online
+    &nbsp;·&nbsp;
+    <a href="/docs" style="color:#60a5fa;text-decoration:none">Swagger ↗</a>
+    &nbsp;·&nbsp;
+    <a href="/public/admin-review.html" style="color:#60a5fa;text-decoration:none">Admin ↗</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>IP Bilateral Network<br><span>API Reference</span></h1>
+  <p class="hero-desc">Sistema bilateral de transferências entre Instituições de Pagamento. Autenticação HMAC-SHA256, compliance integrado (KYC · AML · Blocklist · Limites) e audit trail imutável com hash chain.</p>
+</div>
+
+<div class="cards">
+  <a class="card" href="/docs">
+    <div class="card-icon">📖</div>
+    <div class="card-title">API Docs (Swagger)</div>
+    <div class="card-desc">Documentação interativa completa. Teste todos os endpoints diretamente no browser.</div>
+    <div class="card-link">/docs ↗</div>
+  </a>
+  <a class="card" href="https://ip-partner-onboarding.netlify.app" target="_blank">
+    <div class="card-icon">🏦</div>
+    <div class="card-title">Partner Onboarding Portal</div>
+    <div class="card-desc">Página pública para nova IP parceira preencher os dados e fazer upload dos documentos. EN / ES / PT.</div>
+    <div class="card-link">ip-partner-onboarding.netlify.app ↗</div>
+  </a>
+  <a class="card" href="/public/admin-review.html">
+    <div class="card-icon">🔍</div>
+    <div class="card-title">Admin Review Panel</div>
+    <div class="card-desc">Painel de revisão de submissões. Verifique documentos, aprove ou rejeite parceiros. Requer X-Admin-Key.</div>
+    <div class="card-link">/public/admin-review.html ↗</div>
+  </a>
+</div>
+
+<hr class="divider"/>
+
+<!-- TRANSFERS -->
+<div class="section">
+  <div class="section-title">💸 Transfers <span class="tag">HMAC-SHA256</span></div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/transfers <span class="ep-auth auth-hmac">X-IP-Signature</span></div>
+        <div class="ep-desc">Recebe uma transferência de outra IP. Roda pipeline: KYC → Blocklist → Limites → AML → Liquidação → Webhook.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/transfers/{transfer_id} <span class="ep-auth auth-hmac">X-IP-Signature</span></div>
+        <div class="ep-desc">Consulta status de uma transferência pelo ID.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">POST /transfers — Body</div>
+<pre>{
+  <span class="k">"idempotency_key"</span>: <span class="s">"uuid-gerado-pelo-remetente"</span>,
+  <span class="k">"amount"</span>:          <span class="n">1500.00</span>,
+  <span class="k">"currency"</span>:        <span class="s">"BRL"</span>,
+  <span class="k">"transfer_type"</span>:   <span class="s">"PIX"</span>,
+  <span class="k">"description"</span>:     <span class="s">"Pagamento fatura #1234"</span>,
+  <span class="k">"sender"</span>: {
+    <span class="k">"document"</span>:   <span class="s">"12345678901"</span>,  <span class="c">// CPF sem pontuação</span>
+    <span class="k">"name"</span>:       <span class="s">"João da Silva"</span>,
+    <span class="k">"ispb"</span>:       <span class="s">"00000000"</span>,      <span class="c">// ISPB 8 dígitos</span>
+    <span class="k">"account"</span>:    <span class="s">"12345-6"</span>,
+    <span class="k">"account_type"</span>: <span class="s">"CHECKING"</span>
+  },
+  <span class="k">"receiver"</span>: {
+    <span class="k">"document"</span>:   <span class="s">"98765432100"</span>,
+    <span class="k">"name"</span>:       <span class="s">"Maria Souza"</span>,
+    <span class="k">"ispb"</span>:       <span class="s">"12345678"</span>,
+    <span class="k">"account"</span>:    <span class="s">"98765-4"</span>,
+    <span class="k">"account_type"</span>: <span class="s">"SAVINGS"</span>
+  }
+}</pre>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">Resposta 201</div>
+<pre>{
+  <span class="k">"transfer_id"</span>:     <span class="s">"txn_uuid"</span>,
+  <span class="k">"idempotency_key"</span>: <span class="s">"uuid-do-remetente"</span>,
+  <span class="k">"status"</span>:          <span class="s">"PROCESSING"</span>,
+  <span class="k">"amount"</span>:          <span class="n">1500.00</span>,
+  <span class="k">"currency"</span>:        <span class="s">"BRL"</span>,
+  <span class="k">"created_at"</span>:      <span class="s">"2025-01-15T10:30:00Z"</span>
+}
+
+<span class="c">// Status possíveis:</span>
+<span class="c">// PENDING · PROCESSING · SETTLED · FAILED · REVERSED</span>
+
+<span class="c">// Headers obrigatórios no request:</span>
+<span class="c">// X-IP-Signature: {key_id}.{timestamp}.{hmac_hex}</span>
+<span class="c">// X-Idempotency-Key: uuid</span></pre>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- WEBHOOKS -->
+<div class="section">
+  <div class="section-title">🔔 Webhooks</div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/webhooks <span class="ep-auth auth-hmac">X-IP-Signature</span></div>
+        <div class="ep-desc">Recebe callbacks de status: TRANSFER_SETTLED, TRANSFER_FAILED, TRANSFER_REVERSED, TRANSFER_RECEIVED.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">Payload do Webhook</div>
+<pre>{
+  <span class="k">"event"</span>:       <span class="s">"TRANSFER_SETTLED"</span>,  <span class="c">// ou TRANSFER_FAILED / TRANSFER_REVERSED</span>
+  <span class="k">"transfer_id"</span>: <span class="s">"txn_uuid"</span>,
+  <span class="k">"timestamp"</span>:   <span class="s">"2025-01-15T10:30:05Z"</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"transfer_id"</span>:     <span class="s">"txn_uuid"</span>,
+    <span class="k">"status"</span>:          <span class="s">"SETTLED"</span>,
+    <span class="k">"amount"</span>:          <span class="n">1500.00</span>,
+    <span class="k">"settled_at"</span>:      <span class="s">"2025-01-15T10:30:05Z"</span>,
+    <span class="k">"failure_reason"</span>:  <span class="s">null</span>
+  }
+}</pre>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- RECONCILIATION -->
+<div class="section">
+  <div class="section-title">📊 Reconciliation</div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/reconciliation <span class="ep-auth auth-hmac">X-IP-Signature</span></div>
+        <div class="ep-desc">Reconciliação bilateral. Retorna lista de transferências num período para cruzamento de dados.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+<pre>{
+  <span class="k">"date_from"</span>: <span class="s">"2025-01-01T00:00:00Z"</span>,
+  <span class="k">"date_to"</span>:   <span class="s">"2025-01-31T23:59:59Z"</span>,
+  <span class="k">"page"</span>:      <span class="n">1</span>,
+  <span class="k">"page_size"</span>: <span class="n">100</span>
+}</pre>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- ONBOARDING -->
+<div class="section">
+  <div class="section-title">🤝 Onboarding de IP Peer <span class="tag">X-Admin-Key</span></div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/onboarding/peers <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Cadastra nova IP parceira. Após aprovação no portal, use este endpoint para ativar as credenciais bilaterais.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/onboarding/peers <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Lista todas as IPs cadastradas com status.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-PATCH">PATCH</span>
+      <div>
+        <div class="ep-path">/onboarding/peers/{ispb}/suspend <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Suspende uma IP parceira imediatamente.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">POST /onboarding/peers — Body</div>
+<pre>{
+  <span class="k">"ispb"</span>:          <span class="s">"12345678"</span>,       <span class="c">// 8 dígitos</span>
+  <span class="k">"name"</span>:          <span class="s">"Al Fardan Exchange LLC"</span>,
+  <span class="k">"api_key_id"</span>:    <span class="s">"key_ip_parceira"</span>,
+  <span class="k">"api_secret"</span>:    <span class="s">"secret_hmac_sha256_aqui"</span>,
+  <span class="k">"webhook_url"</span>:   <span class="s">"https://api.parceira.com/webhooks"</span>,
+  <span class="k">"base_url"</span>:      <span class="s">"https://api.parceira.com"</span>,
+  <span class="k">"contact_email"</span>: <span class="s">"compliance@parceira.com"</span>
+}</pre>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- ADMIN -->
+<div class="section">
+  <div class="section-title">⚙️ Admin — Blocklist · Limites · Audit <span class="tag">X-Admin-Key</span></div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/admin/blocklist <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Adiciona CPF, CNPJ, ISPB ou conta à blocklist.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-DELETE">DELETE</span>
+      <div>
+        <div class="ep-path">/admin/blocklist/{id} <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Remove entrada da blocklist.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/admin/limits <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Define limite por escopo: global, peer_ispb ou account.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/admin/audit <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Consulta audit trail com filtro por evento e transfer_id.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/admin/audit/verify <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Verifica integridade da hash chain completa do audit trail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">POST /admin/blocklist</div>
+<pre>{
+  <span class="k">"value"</span>:       <span class="s">"12345678901"</span>,
+  <span class="k">"entry_type"</span>:  <span class="s">"CPF"</span>,  <span class="c">// CPF|CNPJ|ISPB|ACCOUNT</span>
+  <span class="k">"reason"</span>:      <span class="s">"Suspeita de fraude"</span>,
+  <span class="k">"list_source"</span>: <span class="s">"manual"</span>
+}</pre>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">POST /admin/limits</div>
+<pre>{
+  <span class="k">"scope"</span>:            <span class="s">"peer_ispb"</span>, <span class="c">// global|peer_ispb|account</span>
+  <span class="k">"scope_id"</span>:         <span class="s">"12345678"</span>,
+  <span class="k">"max_single_tx"</span>:    <span class="n">50000.00</span>,
+  <span class="k">"max_daily_volume"</span>: <span class="n">500000.00</span>,
+  <span class="k">"max_daily_count"</span>:  <span class="n">100</span>
+}</pre>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- PARTNER ONBOARDING API -->
+<div class="section">
+  <div class="section-title">📄 Partner Onboarding API</div>
+  <div class="endpoint-list">
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/partner/submit <span class="ep-auth auth-pub">PUBLIC</span></div>
+        <div class="ep-desc">Parceiro submete dados da instituição via formulário multipart.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-POST">POST</span>
+      <div>
+        <div class="ep-path">/partner/{ref}/documents <span class="ep-auth auth-pub">PUBLIC</span></div>
+        <div class="ep-desc">Upload de documento (multipart/form-data). Um arquivo por request. Gera SHA-256 automático.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/partner/submissions <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Lista todas as submissões de parceiros. Filtro: ?status_filter=PENDING|UNDER_REVIEW|APPROVED|REJECTED</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-PATCH">PATCH</span>
+      <div>
+        <div class="ep-path">/partner/submissions/{ref}/review <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Aprova, rejeita ou marca como UNDER_REVIEW. Aceita comentário.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-PATCH">PATCH</span>
+      <div>
+        <div class="ep-path">/partner/documents/{id}/verify <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Marca documento como verificado após conferência manual.</div>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="method m-GET">GET</span>
+      <div>
+        <div class="ep-path">/partner/documents/{id}/download <span class="ep-auth auth-admin">X-Admin-Key</span></div>
+        <div class="ep-desc">Download do arquivo original enviado pelo parceiro.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- HMAC -->
+<div class="section">
+  <div class="section-title">🔐 Autenticação HMAC-SHA256</div>
+  <div class="grid2">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">Como assinar um request</div>
+<pre><span class="c"># Header obrigatório:</span>
+X-IP-Signature: {key_id}.{timestamp_ms}.{hmac}
+
+<span class="c"># Onde hmac = HMAC-SHA256 de:</span>
+"{method}\n{path}\n{timestamp_ms}\n{body_sha256}"
+
+<span class="c"># Exemplo Python:</span>
+import hmac, hashlib, time, json
+
+body    = json.dumps(payload).encode()
+ts      = str(int(time.time() * 1000))
+msg     = f"POST\n/transfers\n{ts}\n" \
+          + hashlib.sha256(body).hexdigest()
+sig     = hmac.new(secret.encode(),
+          msg.encode(), hashlib.sha256).hexdigest()
+header  = f"{key_id}.{ts}.{sig}"</pre>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">Variáveis de ambiente (.env)</div>
+<pre><span class="c"># Identidade desta IP</span>
+THIS_ISPB=<span class="s">00000000</span>
+THIS_NAME=<span class="s">Minha Instituição SA</span>
+API_KEY_ID=<span class="s">minha_key_id</span>
+API_SECRET=<span class="s">meu_secret_hmac</span>
+
+<span class="c"># Peers conhecidos (JSON inline)</span>
+KNOWN_PEERS_JSON=<span class="s">{"key_ip_b":"secret_ip_b"}</span>
+
+<span class="c"># Webhook da outra IP</span>
+PEER_WEBHOOK_URL=<span class="s">https://ip-parceira.com/webhooks</span>
+
+<span class="c"># Admin</span>
+ADMIN_KEY=<span class="s">chave-forte-aqui</span>
+
+<span class="c"># Banco (SQLite dev / PostgreSQL prod)</span>
+DATABASE_URL=<span class="s">sqlite+aiosqlite:///./bilateral.db</span></pre>
+    </div>
+  </div>
+</div>
+
+<div style="padding:24px 32px;text-align:center;color:#475569;font-size:12px;border-top:1px solid #1e2a3a">
+  IP Bilateral Network API · <a href="/docs" style="color:#60a5fa;text-decoration:none">Swagger</a> · <a href="/public/admin-review.html" style="color:#60a5fa;text-decoration:none">Admin Panel</a> · <a href="https://ip-partner-onboarding.netlify.app" style="color:#60a5fa;text-decoration:none">Partner Portal</a>
+</div>
+
+</body>
+</html>
