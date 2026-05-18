@@ -2,7 +2,7 @@ app = "ip-bilateral-api"
 primary_region = "gru"
 
 [build]
-  builder = "paketobuildpacks/builder:base"
+  dockerfile = "Dockerfile"
 
 [env]
   THIS_ISPB    = "00000000"
