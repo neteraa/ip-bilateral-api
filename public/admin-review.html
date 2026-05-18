@@ -97,7 +97,7 @@
     <div style="display:flex;align-items:center;gap:8px">
     <input class="key-input" id="adminKey" type="password" placeholder="X-Admin-Key…" onkeydown="if(event.key==='Enter')loadSubmissions()"/>
     <button class="btn btn-blue" onclick="loadSubmissions()">🔓 Load</button>
-    <a href="https://ip-bilateral-api-production.up.railway.app/docs" target="_blank" class="btn btn-gray" style="font-size:12px">API Docs ↗</a>
+    <a href="https://ip-bilateral-api.fly.dev/docs" target="_blank" class="btn btn-gray" style="font-size:12px">API Docs ↗</a>
     <a href="https://ip-partner-onboarding.netlify.app" target="_blank" class="btn btn-gray" style="font-size:12px">Partner Portal ↗</a>
   </div>
 </div>
@@ -134,7 +134,7 @@
 <div id="toast"></div>
 
 <script>
-const API = 'https://ip-bilateral-api-production.up.railway.app';
+const API = 'https://ip-bilateral-api.fly.dev';
 let currentFilter = '';
 let submissions = [];
 let currentRef = null;
