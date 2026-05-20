@@ -84,20 +84,6 @@
   .audit-entry.show{display:block}
   .full-width{grid-column:1/-1}
   .hash-display{font-size:10px;color:#475569;font-family:monospace;word-break:break-all;margin-top:4px}
-  .terminal{background:#060810;border:1px solid #1e2a3a;border-radius:12px;padding:0;overflow:hidden;margin-bottom:20px;font-family:'Courier New',monospace}
-  .term-bar{background:#1a1f2e;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e2a3a}
-  .term-dot{width:12px;height:12px;border-radius:50%}
-  .term-body{padding:18px 20px;font-size:13px;line-height:1.8;min-height:120px}
-  .term-line{display:flex;align-items:center;gap:8px;white-space:pre}
-  .term-prompt{color:#3b82f6;font-weight:700}
-  .term-cmd{color:#e2e8f0}
-  .term-out{color:#64748b}
-  .term-ok{color:#4ade80}
-  .term-warn{color:#fbbf24}
-  .term-pwd-line{display:flex;align-items:center;gap:8px}
-  .term-pwd-input{background:transparent;border:none;outline:none;color:#e2e8f0;font-family:'Courier New',monospace;font-size:13px;letter-spacing:3px;width:160px;caret-color:#3b82f6}
-  .term-cursor{display:inline-block;width:8px;height:14px;background:#3b82f6;animation:blink .8s infinite;vertical-align:middle}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 </style>
 </head>
 <body>
@@ -125,27 +111,7 @@
   <h1>Transfer Execution</h1>
   <p class="subtitle">Bilateral institutional transfer · Secure environment</p>
 
-  <!-- Terminal Auth -->
-  <div class="terminal" id="termPanel">
-    <div class="term-bar">
-      <div class="term-dot" style="background:#ef4444"></div>
-      <div class="term-dot" style="background:#fbbf24"></div>
-      <div class="term-dot" style="background:#22c55e"></div>
-      <span style="font-size:12px;color:#475569;margin-left:8px">bilateral-cli — bash</span>
-    </div>
-    <div class="term-body" id="termBody" onclick="document.getElementById('termPwd').focus()">
-      <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd"> bilateral-cli transfer --amount 250000000 --currency EUR --peer GEO-00481400</span></div>
-      <div class="term-line" style="margin-top:6px"><span class="term-warn">🔐 Authentication required. Enter admin password:</span></div>
-      <div class="term-pwd-line" style="margin-top:4px">
-        <span class="term-prompt">Password:</span>
-        <input class="term-pwd-input" id="termPwd" type="password" maxlength="14" placeholder="" autocomplete="off" autofocus onkeydown="if(event.key==='Enter')checkTermPwd()"/>
-        <span class="term-cursor" id="termCursor"></span>
-      </div>
-      <div id="termOutput"></div>
-    </div>
-  </div>
-
-  <div class="layout" id="mainLayout" style="display:none">
+  <div class="layout" id="mainLayout">
 
     <!-- LEFT: Request Builder -->
     <div>
@@ -426,48 +392,12 @@ function runDemo() {
   }, finalDelay);
 }
 
-function checkTermPwd() {
-  const pwd = document.getElementById('termPwd').value;
-  const out = document.getElementById('termOutput');
-  const cursor = document.getElementById('termCursor');
-  if (pwd === 'qB6tFX6SNBCzm6') {
-    document.getElementById('termPwd').style.display = 'none';
-    cursor.style.display = 'none';
-    const lines = [
-      {cls:'term-ok', txt:'✓ Authenticated as: admin · key_id: key_ip_bilateral'},
-      {cls:'term-out', txt:'→ Validating peer GEO-00481400... OK'},
-      {cls:'term-out', txt:'→ Checking prefunded balance... €320,000,000 available'},
-      {cls:'term-out', txt:'→ AML/OFAC screening... CLEAR'},
-      {cls:'term-ok', txt:'✓ All checks passed. Launching transfer UI...'},
-    ];
-    let delay = 0;
-    lines.forEach(l => {
-      setTimeout(() => {
-        const d = document.createElement('div');
-        d.className = 'term-line';
-        d.innerHTML = `<span class="${l.cls}">${l.txt}</span>`;
-        out.appendChild(d);
-      }, delay);
-      delay += 400;
-    });
-    setTimeout(() => {
-      document.getElementById('mainLayout').style.display = 'grid';
-      document.getElementById('mainLayout').scrollIntoView({behavior:'smooth'});
-    }, delay + 200);
-  } else {
-    out.innerHTML = '<div class="term-line"><span style="color:#f87171">✗ Access denied. Incorrect password.</span></div>';
-    document.getElementById('termPwd').value = '';
-    setTimeout(() => { out.innerHTML = ''; }, 1200);
-  }
-}
-
 function checkGate() {
   const pwd = document.getElementById('gateInput').value;
   const input = document.getElementById('gateInput');
   const err = document.getElementById('gateErr');
   if (pwd === 'qB6tFX6SNBCzm6') {
     document.getElementById('gate').style.display = 'none';
-    setTimeout(() => document.getElementById('termPwd').focus(), 100);
   } else {
     input.className = 'gate-input err';
     err.style.display = 'block';
