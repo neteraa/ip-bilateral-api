@@ -84,9 +84,40 @@
   .audit-entry.show{display:block}
   .full-width{grid-column:1/-1}
   .hash-display{font-size:10px;color:#475569;font-family:monospace;word-break:break-all;margin-top:4px}
+  #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:9998;display:none;align-items:center;justify-content:center}
+  #confirmModal.show{display:flex}
+  .confirm-box{background:#0f1117;border:1px solid #3b82f6;border-radius:16px;padding:36px 32px;width:100%;max-width:380px;text-align:center}
+  .confirm-icon{font-size:32px;margin-bottom:14px}
+  .confirm-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px}
+  .confirm-sub{font-size:13px;color:#64748b;margin-bottom:8px}
+  .confirm-amount{font-size:22px;font-weight:900;color:#a78bfa;margin-bottom:24px;font-family:monospace}
+  .confirm-input{width:100%;background:#0a0d14;border:1px solid #2d3a4a;border-radius:10px;padding:12px 16px;color:#e2e8f0;font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:6px;font-family:monospace}
+  .confirm-input:focus{border-color:#3b82f6}
+  .confirm-hint{font-size:11px;color:#475569;margin-bottom:16px}
+  .confirm-hint span{color:#60a5fa}
+  .confirm-err{font-size:12px;color:#f87171;margin-bottom:10px;display:none}
+  .confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn-cancel{padding:11px;background:#1e2a3a;color:#94a3b8;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+  .btn-confirm{padding:11px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
 </style>
 </head>
 <body>
+
+<div id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-icon">🔑</div>
+    <div class="confirm-title">Authorize Transfer</div>
+    <div class="confirm-sub">Enter your authorization password to confirm</div>
+    <div class="confirm-amount">€ 250,000,000.00 EUR</div>
+    <input class="confirm-input" id="confirmPwd" type="password" maxlength="14" placeholder="••••••••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')submitConfirm()"/>
+    <div class="confirm-hint">Password must be <span>14 characters</span></div>
+    <div class="confirm-err" id="confirmErr">Password must be exactly 14 characters.</div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm" onclick="submitConfirm()">Authorize →</button>
+    </div>
+  </div>
+</div>
 
 <div id="gate">
   <div class="gate-box">
@@ -163,7 +194,7 @@
             <div class="field-label">Description</div>
             <div class="field-value">Bilateral settlement — institutional prefund tranche #1</div>
           </div>
-          <button class="btn-execute" id="btnExecute" onclick="runDemo()">⚡ Execute Transfer</button>
+          <button class="btn-execute" id="btnExecute" onclick="openConfirm()">⚡ Execute Transfer</button>
           <button class="btn-reset" id="btnReset" onclick="resetDemo()" style="display:none">↺ Reset Demo</button>
         </div>
       </div>
@@ -390,6 +421,31 @@ function runDemo() {
     document.getElementById('auditHash').textContent = 'SHA-256 chain: a9f3c2d8e1b47f0c9a2e5d3b8f1c4e7a2d9b0f3c6e1a8d5b2f9c4e7a0d3b6f1';
     document.getElementById('btnReset').style.display = 'block';
   }, finalDelay);
+}
+
+function openConfirm() {
+  document.getElementById('confirmModal').classList.add('show');
+  setTimeout(() => document.getElementById('confirmPwd').focus(), 100);
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('show');
+  document.getElementById('confirmPwd').value = '';
+  document.getElementById('confirmErr').style.display = 'none';
+}
+
+function submitConfirm() {
+  const pwd = document.getElementById('confirmPwd').value;
+  const err = document.getElementById('confirmErr');
+  if (pwd.length !== 14) {
+    err.style.display = 'block';
+    document.getElementById('confirmPwd').style.borderColor = '#ef4444';
+    setTimeout(() => { document.getElementById('confirmPwd').style.borderColor = ''; }, 800);
+    return;
+  }
+  closeConfirm();
+  document.getElementById('btnExecute').disabled = true;
+  runDemo();
 }
 
 function checkGate() {
