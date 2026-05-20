@@ -7,6 +7,17 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0d14;color:#e2e8f0;min-height:100vh}
+  #gate{position:fixed;inset:0;background:#0a0d14;z-index:9999;display:flex;align-items:center;justify-content:center}
+  .gate-box{background:#0f1117;border:1px solid #1e2a3a;border-radius:16px;padding:40px 36px;width:100%;max-width:360px;text-align:center}
+  .gate-icon{font-size:36px;margin-bottom:16px}
+  .gate-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
+  .gate-sub{font-size:13px;color:#64748b;margin-bottom:28px}
+  .gate-input{width:100%;background:#0a0d14;border:1px solid #2d3a4a;border-radius:10px;padding:12px 16px;color:#e2e8f0;font-size:16px;text-align:center;letter-spacing:3px;outline:none;margin-bottom:12px;font-family:monospace}
+  .gate-input:focus{border-color:#3b82f6}
+  .gate-input.err{border-color:#ef4444;animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .gate-btn{width:100%;padding:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer}
+  .gate-err{font-size:12px;color:#f87171;margin-top:8px;display:none}
   .topbar{background:#0f1117;border-bottom:1px solid #1e2a3a;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
   .logo{display:flex;align-items:center;gap:10px}
   .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -76,6 +87,17 @@
 </style>
 </head>
 <body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-icon">🔐</div>
+    <div class="gate-title">Restricted Access</div>
+    <div class="gate-sub">Enter the access password to view this demo</div>
+    <input class="gate-input" id="gateInput" type="password" maxlength="14" placeholder="••••••••••••••" onkeydown="if(event.key==='Enter')checkGate()"/>
+    <button class="gate-btn" onclick="checkGate()">Unlock →</button>
+    <div class="gate-err" id="gateErr">Incorrect password. Try again.</div>
+  </div>
+</div>
 
 <div class="topbar">
   <div class="logo">
@@ -368,6 +390,19 @@ function runDemo() {
     document.getElementById('auditHash').textContent = 'SHA-256 chain: a9f3c2d8e1b47f0c9a2e5d3b8f1c4e7a2d9b0f3c6e1a8d5b2f9c4e7a0d3b6f1';
     document.getElementById('btnReset').style.display = 'block';
   }, finalDelay);
+}
+
+function checkGate() {
+  const pwd = document.getElementById('gateInput').value;
+  const input = document.getElementById('gateInput');
+  const err = document.getElementById('gateErr');
+  if (pwd === 'qB6tFX6SNBCzm6') {
+    document.getElementById('gate').style.display = 'none';
+  } else {
+    input.className = 'gate-input err';
+    err.style.display = 'block';
+    setTimeout(() => { input.className = 'gate-input'; input.value = ''; }, 800);
+  }
 }
 
 function resetDemo() {
