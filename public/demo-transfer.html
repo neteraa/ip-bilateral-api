@@ -84,6 +84,21 @@
   .audit-entry.show{display:block}
   .full-width{grid-column:1/-1}
   .hash-display{font-size:10px;color:#475569;font-family:monospace;word-break:break-all;margin-top:4px}
+  .terminal{background:#060810;border:1px solid #1e2a3a;border-radius:12px;padding:0;overflow:hidden;margin-bottom:20px;font-family:'Courier New',monospace}
+  .term-bar{background:#1a1f2e;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e2a3a}
+  .term-dot{width:12px;height:12px;border-radius:50%}
+  .term-body{padding:18px 20px;font-size:13px;line-height:1.8;min-height:100px;cursor:text}
+  .term-line{display:flex;align-items:center;gap:8px;white-space:pre-wrap}
+  .term-prompt{color:#3b82f6;font-weight:700;flex-shrink:0}
+  .term-cmd{color:#e2e8f0}
+  .term-ok{color:#4ade80}
+  .term-warn{color:#fbbf24}
+  .term-err{color:#f87171}
+  .term-dim{color:#64748b}
+  .term-pwd-row{display:flex;align-items:center;gap:8px;margin-top:2px}
+  .term-pwd-input{background:transparent;border:none;outline:none;color:#e2e8f0;font-family:'Courier New',monospace;font-size:13px;letter-spacing:4px;width:180px}
+  .term-cursor{display:inline-block;width:8px;height:14px;background:#3b82f6;animation:blink .8s steps(1) infinite;vertical-align:middle;margin-left:2px}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
   #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:9998;display:none;align-items:center;justify-content:center}
   #confirmModal.show{display:flex}
   .confirm-box{background:#0f1117;border:1px solid #3b82f6;border-radius:16px;padding:36px 32px;width:100%;max-width:380px;text-align:center}
@@ -103,6 +118,8 @@
 </head>
 <body>
 
+<!-- no gate -->
+
 <div id="confirmModal">
   <div class="confirm-box">
     <div class="confirm-icon">🔑</div>
@@ -119,20 +136,10 @@
   </div>
 </div>
 
-<div id="gate">
-  <div class="gate-box">
-    <div class="gate-icon">🔐</div>
-    <div class="gate-title">Restricted Access</div>
-    <div class="gate-sub">Enter the access password to view this demo</div>
-    <input class="gate-input" id="gateInput" type="password" maxlength="14" placeholder="••••••••••••••" onkeydown="if(event.key==='Enter')checkGate()"/>
-    <button class="gate-btn" onclick="checkGate()">Unlock →</button>
-    <div class="gate-err" id="gateErr">Incorrect password. Try again.</div>
-  </div>
-</div>
 
 <div class="topbar">
   <div class="logo">
-    <div class="logo-icon">🔗</div>
+    <div class="logo-icon">�</div>
     <div class="logo-text">IP Bilateral Network</div>
   </div>
   <div style="font-size:13px;color:#64748b"><span class="live-dot"></span>Live Environment</div>
@@ -141,8 +148,26 @@
 <div class="container">
   <h1>Transfer Execution</h1>
   <p class="subtitle">Bilateral institutional transfer · Secure environment</p>
+  <div class="terminal">
+    <div class="term-bar">
+      <div class="term-dot" style="background:#ef4444"></div>
+      <div class="term-dot" style="background:#fbbf24"></div>
+      <div class="term-dot" style="background:#22c55e"></div>
+      <span style="font-size:12px;color:#475569;margin-left:8px">bilateral-cli — bash</span>
+    </div>
+    <div class="term-body" id="termBody" onclick="document.getElementById('termPwd').focus()">
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd"> bilateral-cli transfer --amount 250000000 --currency EUR --peer GEO-00481400</span></div>
+      <div class="term-line" style="margin-top:4px"><span class="term-warn">🔐 Authentication required. Enter admin password:</span></div>
+      <div class="term-pwd-row">
+        <span class="term-prompt">Password:</span>
+        <input class="term-pwd-input" id="termPwd" type="password" maxlength="14" autocomplete="off" autofocus onkeydown="if(event.key==='Enter')checkTermPwd()"/>
+        <span class="term-cursor" id="termCursor"></span>
+      </div>
+      <div id="termOutput"></div>
+    </div>
+  </div>
 
-  <div class="layout" id="mainLayout">
+  <div class="layout" id="mainLayout" style="display:none">
 
     <!-- LEFT: Request Builder -->
     <div>
@@ -423,6 +448,40 @@ function runDemo() {
   }, finalDelay);
 }
 
+function checkTermPwd() {
+  const pwd = document.getElementById('termPwd').value;
+  const out = document.getElementById('termOutput');
+  if (pwd.length !== 14) {
+    out.innerHTML = '<div class="term-line"><span class="term-err">✗ Password must be exactly 14 characters.</span></div>';
+    document.getElementById('termPwd').value = '';
+    setTimeout(() => { out.innerHTML = ''; }, 1200);
+    return;
+  }
+  document.getElementById('termPwd').style.display = 'none';
+  document.getElementById('termCursor').style.display = 'none';
+  const lines = [
+    {cls:'term-ok',  txt:'✓ Authenticated · key_id: key_ip_bilateral'},
+    {cls:'term-dim', txt:'→ Validating peer GEO-00481400... OK'},
+    {cls:'term-dim', txt:'→ Checking prefunded balance... €320,000,000 available'},
+    {cls:'term-dim', txt:'→ AML/OFAC screening... CLEAR'},
+    {cls:'term-ok',  txt:'✓ All checks passed. Loading transfer panel...'},
+  ];
+  let delay = 0;
+  lines.forEach(l => {
+    setTimeout(() => {
+      const d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = `<span class="${l.cls}">${l.txt}</span>`;
+      out.appendChild(d);
+    }, delay);
+    delay += 350;
+  });
+  setTimeout(() => {
+    document.getElementById('mainLayout').style.display = 'grid';
+    document.getElementById('mainLayout').scrollIntoView({behavior:'smooth'});
+  }, delay + 200);
+}
+
 function openConfirm() {
   document.getElementById('confirmModal').classList.add('show');
   setTimeout(() => document.getElementById('confirmPwd').focus(), 100);
@@ -446,19 +505,6 @@ function submitConfirm() {
   closeConfirm();
   document.getElementById('btnExecute').disabled = true;
   runDemo();
-}
-
-function checkGate() {
-  const pwd = document.getElementById('gateInput').value;
-  const input = document.getElementById('gateInput');
-  const err = document.getElementById('gateErr');
-  if (pwd === 'qB6tFX6SNBCzm6') {
-    document.getElementById('gate').style.display = 'none';
-  } else {
-    input.className = 'gate-input err';
-    err.style.display = 'block';
-    setTimeout(() => { input.className = 'gate-input'; input.value = ''; }, 800);
-  }
 }
 
 function resetDemo() {
