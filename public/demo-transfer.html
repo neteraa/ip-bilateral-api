@@ -133,12 +133,12 @@
       <div class="term-dot" style="background:#22c55e"></div>
       <span style="font-size:12px;color:#475569;margin-left:8px">bilateral-cli — bash</span>
     </div>
-    <div class="term-body" id="termBody">
+    <div class="term-body" id="termBody" onclick="document.getElementById('termPwd').focus()">
       <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd"> bilateral-cli transfer --amount 250000000 --currency EUR --peer GEO-00481400</span></div>
       <div class="term-line" style="margin-top:6px"><span class="term-warn">🔐 Authentication required. Enter admin password:</span></div>
       <div class="term-pwd-line" style="margin-top:4px">
         <span class="term-prompt">Password:</span>
-        <input class="term-pwd-input" id="termPwd" type="password" maxlength="14" placeholder="" autocomplete="off" onkeydown="if(event.key==='Enter')checkTermPwd()"/>
+        <input class="term-pwd-input" id="termPwd" type="password" maxlength="14" placeholder="" autocomplete="off" autofocus onkeydown="if(event.key==='Enter')checkTermPwd()"/>
         <span class="term-cursor" id="termCursor"></span>
       </div>
       <div id="termOutput"></div>
@@ -467,6 +467,7 @@ function checkGate() {
   const err = document.getElementById('gateErr');
   if (pwd === 'qB6tFX6SNBCzm6') {
     document.getElementById('gate').style.display = 'none';
+    setTimeout(() => document.getElementById('termPwd').focus(), 100);
   } else {
     input.className = 'gate-input err';
     err.style.display = 'block';
