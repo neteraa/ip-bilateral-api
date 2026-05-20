@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>IP Bilateral — Live Transfer Demo</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0d14;color:#e2e8f0;min-height:100vh}
+  .topbar{background:#0f1117;border-bottom:1px solid #1e2a3a;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .logo-text{font-size:15px;font-weight:800;color:#fff}
+  .badge-demo{background:#422006;color:#fbbf24;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px}
+  .live-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.2)}}
+  .container{max-width:1200px;margin:0 auto;padding:32px 24px}
+  h1{font-size:28px;font-weight:900;color:#fff;margin-bottom:6px}
+  .subtitle{color:#64748b;font-size:14px;margin-bottom:32px}
+  .layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .panel{background:#0f1117;border:1px solid #1e2a3a;border-radius:14px;overflow:hidden}
+  .panel-header{padding:14px 18px;border-bottom:1px solid #1e2a3a;display:flex;align-items:center;justify-content:space-between}
+  .panel-title{font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+  .panel-body{padding:20px}
+  .field-group{margin-bottom:16px}
+  .field-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .field-value{background:#0a0d14;border:1px solid #1e2a3a;border-radius:8px;padding:10px 14px;font-size:13px;color:#e2e8f0;font-family:monospace}
+  .field-value.highlight{border-color:#3b82f6;color:#60a5fa;font-size:16px;font-weight:700}
+  .field-value.amount{border-color:#8b5cf6;color:#a78bfa;font-size:22px;font-weight:900;text-align:center;padding:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn-execute{width:100%;padding:16px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;font-size:15px;font-weight:800;border:none;border-radius:10px;cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:.3px}
+  .btn-execute:hover{opacity:.9;transform:translateY(-1px)}
+  .btn-execute:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-reset{width:100%;padding:10px;background:#1e2a3a;color:#94a3b8;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
+  .timeline{display:flex;flex-direction:column;gap:0}
+  .t-step{display:flex;gap:14px;padding:14px 0;opacity:.3;transition:all .4s}
+  .t-step.active{opacity:1}
+  .t-step.done{opacity:1}
+  .t-step+.t-step{border-top:1px solid #1a1f2e}
+  .t-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;border:2px solid #1e2a3a;transition:all .4s}
+  .t-dot.pending{border-color:#1e2a3a;color:#475569}
+  .t-dot.running{border-color:#3b82f6;color:#3b82f6;animation:spin .8s linear infinite}
+  .t-dot.ok{background:#14532d;border-color:#22c55e;color:#4ade80}
+  .t-dot.err{background:#450a0a;border-color:#ef4444;color:#f87171}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .t-body h4{font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:3px}
+  .t-body p{font-size:12px;color:#64748b}
+  .t-body .t-detail{font-size:11px;color:#3b82f6;font-family:monospace;margin-top:4px;display:none}
+  .t-step.done .t-detail,.t-step.active .t-detail{display:block}
+  .json-block{background:#060810;border:1px solid #1e2a3a;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;line-height:1.7;overflow-x:auto;max-height:320px;overflow-y:auto}
+  .json-block .k{color:#60a5fa}
+  .json-block .s{color:#86efac}
+  .json-block .n{color:#fbbf24}
+  .json-block .b{color:#f472b6}
+  .json-block .c{color:#475569}
+  .status-bar{display:flex;align-items:center;gap:10px;background:#0a0d14;border:1px solid #1e2a3a;border-radius:8px;padding:10px 14px;margin-bottom:12px}
+  .status-label{font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px}
+  .s-idle{background:#1e2a3a;color:#64748b}
+  .s-processing{background:#1e3a5f;color:#60a5fa}
+  .s-success{background:#14532d;color:#4ade80}
+  .s-error{background:#450a0a;color:#f87171}
+  .balance-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .balance-card{background:#0a0d14;border:1px solid #1e2a3a;border-radius:10px;padding:16px;text-align:center}
+  .balance-card .label{font-size:11px;color:#64748b;font-weight:600;margin-bottom:6px}
+  .balance-card .value{font-size:20px;font-weight:900;font-family:monospace}
+  .balance-card.sender .value{color:#f87171}
+  .balance-card.receiver .value{color:#4ade80}
+  .webhook-block{background:#0a0d14;border:1px solid #422006;border-radius:10px;padding:14px;margin-top:12px;display:none}
+  .webhook-block.show{display:block}
+  .webhook-title{font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .audit-entry{background:#0a0d14;border:1px solid #1e2a3a;border-radius:8px;padding:12px;margin-top:8px;font-family:monospace;font-size:11px;color:#64748b;display:none}
+  .audit-entry.show{display:block}
+  .full-width{grid-column:1/-1}
+  .hash-display{font-size:10px;color:#475569;font-family:monospace;word-break:break-all;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🔗</div>
+    <div class="logo-text">IP Bilateral Network</div>
+    <div class="badge-demo">⚡ DEMO</div>
+  </div>
+  <div style="font-size:13px;color:#64748b"><span class="live-dot"></span>Simulated Environment</div>
+</div>
+
+<div class="container">
+  <h1>Live Transfer Simulation</h1>
+  <p class="subtitle">Simulating a bilateral institutional transfer · All data is fictional for demonstration purposes</p>
+
+  <div class="layout">
+
+    <!-- LEFT: Request Builder -->
+    <div>
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header">
+          <span class="panel-title">📤 Transfer Request</span>
+          <span style="font-size:11px;color:#475569">POST /transfers</span>
+        </div>
+        <div class="panel-body">
+          <div class="field-group">
+            <div class="field-label">Amount</div>
+            <div class="field-value amount">€ 250,000,000.00 EUR</div>
+          </div>
+          <div class="grid2">
+            <div class="field-group">
+              <div class="field-label">Sender IP (ISPB)</div>
+              <div class="field-value">GEO-00481400</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Receiver IP (ISPB)</div>
+              <div class="field-value">BRA-00000001</div>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field-group">
+              <div class="field-label">Sender Name</div>
+              <div class="field-value">TBC Bank Georgia</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Sender Document</div>
+              <div class="field-value">GE-204873991</div>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field-group">
+              <div class="field-label">Receiver Name</div>
+              <div class="field-value">IP Bilateral Network</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Receiver Account</div>
+              <div class="field-value">BIL-9900012-X</div>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">External ID</div>
+            <div class="field-value highlight">TXN-GE-2025-EUR-250M-001</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Description</div>
+            <div class="field-value">Bilateral settlement — institutional prefund tranche #1</div>
+          </div>
+          <button class="btn-execute" id="btnExecute" onclick="runDemo()">⚡ Execute Transfer</button>
+          <button class="btn-reset" id="btnReset" onclick="resetDemo()" style="display:none">↺ Reset Demo</button>
+        </div>
+      </div>
+
+      <!-- Balances -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">💰 Prefunded Balances</span>
+          <span id="balanceStatus" style="font-size:11px;color:#475569">Before transfer</span>
+        </div>
+        <div class="panel-body">
+          <div class="balance-row">
+            <div class="balance-card sender">
+              <div class="label">TBC Bank Georgia</div>
+              <div class="value" id="balSender">€ 320,000,000</div>
+            </div>
+            <div class="balance-card receiver">
+              <div class="label">IP Bilateral Network</div>
+              <div class="value" id="balReceiver">€ 48,500,000</div>
+            </div>
+          </div>
+          <div class="audit-entry" id="auditEntry">
+            <div style="color:#3b82f6;font-weight:700;margin-bottom:6px">📋 AUDIT LOG ENTRY</div>
+            <div>event: TRANSFER_COMPLETED</div>
+            <div>actor: geo-peer-tbc</div>
+            <div>transfer_id: <span style="color:#fbbf24">TXN-GE-2025-EUR-250M-001</span></div>
+            <div>amount: 250000000.00 EUR</div>
+            <div>timestamp: <span id="auditTs"></span></div>
+            <div class="hash-display" id="auditHash"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Response + Timeline -->
+    <div>
+      <!-- Status -->
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header">
+          <span class="panel-title">⚙️ Execution Pipeline</span>
+          <span class="status-label s-idle" id="statusLabel">IDLE</span>
+        </div>
+        <div class="panel-body">
+          <div class="timeline">
+            <div class="t-step" id="s1">
+              <div class="t-dot pending" id="d1">1</div>
+              <div class="t-body">
+                <h4>HMAC-SHA256 Signature Verification</h4>
+                <p>Validate request authenticity from sender peer</p>
+                <div class="t-detail">✓ Signature valid · key_id: key_tbc_georgia · algo: HMAC-SHA256</div>
+              </div>
+            </div>
+            <div class="t-step" id="s2">
+              <div class="t-dot pending" id="d2">2</div>
+              <div class="t-body">
+                <h4>KYC Validation</h4>
+                <p>Verify sender and receiver document formats</p>
+                <div class="t-detail">✓ Sender doc GE-204873991 · Receiver account BIL-9900012-X · Both valid</div>
+              </div>
+            </div>
+            <div class="t-step" id="s3">
+              <div class="t-dot pending" id="d3">3</div>
+              <div class="t-body">
+                <h4>AML / Blocklist Screening</h4>
+                <p>Cross-check against OFAC, COAF and custom blocklist</p>
+                <div class="t-detail">✓ 0 matches found · OFAC SDN: clear · COAF: clear · Custom: clear</div>
+              </div>
+            </div>
+            <div class="t-step" id="s4">
+              <div class="t-dot pending" id="d4">4</div>
+              <div class="t-body">
+                <h4>Transfer Limit Check</h4>
+                <p>Validate against per-peer and global daily limits</p>
+                <div class="t-detail">✓ Peer limit: €500M/day · Used: €0 · This transfer: €250M · OK</div>
+              </div>
+            </div>
+            <div class="t-step" id="s5">
+              <div class="t-dot pending" id="d5">5</div>
+              <div class="t-body">
+                <h4>Prefunded Balance Debit</h4>
+                <p>Debit sender prefunded account atomically</p>
+                <div class="t-detail">✓ Debited €250,000,000 from TBC Georgia · New balance: €70,000,000</div>
+              </div>
+            </div>
+            <div class="t-step" id="s6">
+              <div class="t-dot pending" id="d6">6</div>
+              <div class="t-body">
+                <h4>Settlement Credit</h4>
+                <p>Credit receiver account and persist to ledger</p>
+                <div class="t-detail">✓ Credited €250,000,000 to IP Bilateral · New balance: €298,500,000</div>
+              </div>
+            </div>
+            <div class="t-step" id="s7">
+              <div class="t-dot pending" id="d7">7</div>
+              <div class="t-body">
+                <h4>Webhook Dispatch</h4>
+                <p>Push notification to both peers' webhook endpoints</p>
+                <div class="t-detail">✓ POST → https://api.tbcbank.ge/webhooks · 200 OK · 43ms</div>
+              </div>
+            </div>
+            <div class="t-step" id="s8">
+              <div class="t-dot pending" id="d8">8</div>
+              <div class="t-body">
+                <h4>Audit Trail Commit</h4>
+                <p>Hash chain entry written and signed</p>
+                <div class="t-detail">✓ Block #8841 committed · SHA-256 chain integrity: verified</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Response -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">📥 API Response</span>
+          <span id="respStatus" style="font-size:12px;font-weight:700;color:#475569">Waiting...</span>
+        </div>
+        <div class="panel-body">
+          <div class="json-block" id="jsonResponse">
+<span class="c">// Execute the transfer to see the response</span>
+          </div>
+          <div class="webhook-block" id="webhookBlock">
+            <div class="webhook-title">🔔 Webhook Received — TBC Bank Georgia</div>
+            <div class="json-block" style="border-color:#422006">
+<span class="k">"event"</span>: <span class="s">"transfer.completed"</span>,
+<span class="k">"transfer_id"</span>: <span class="s">"TXN-GE-2025-EUR-250M-001"</span>,
+<span class="k">"amount"</span>: <span class="n">250000000.00</span>,
+<span class="k">"currency"</span>: <span class="s">"EUR"</span>,
+<span class="k">"status"</span>: <span class="s">"COMPLETED"</span>,
+<span class="k">"settled_at"</span>: <span class="s" id="webhookTs"></span>,
+<span class="k">"hmac_signature"</span>: <span class="s">"a9f3c2...verified"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const steps = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+const dots  = ['d1','d2','d3','d4','d5','d6','d7','d8'];
+const delays = [600, 900, 1400, 1900, 2500, 3100, 3700, 4300];
+
+function setStep(i, state) {
+  const s = document.getElementById(steps[i]);
+  const d = document.getElementById(dots[i]);
+  s.className = 't-step ' + state;
+  d.className = 't-dot ' + (state === 'active' ? 'running' : state === 'done' ? 'ok' : 'pending');
+  if (state === 'active') d.textContent = '↻';
+  else if (state === 'done') d.textContent = '✓';
+  else d.textContent = i + 1;
+}
+
+function runDemo() {
+  document.getElementById('btnExecute').disabled = true;
+  document.getElementById('statusLabel').className = 'status-label s-processing';
+  document.getElementById('statusLabel').textContent = 'PROCESSING';
+
+  steps.forEach((_,i) => {
+    setTimeout(() => setStep(i, 'active'), delays[i]);
+    setTimeout(() => setStep(i, 'done'), delays[i] + 600);
+  });
+
+  // Balance update after step 5
+  setTimeout(() => {
+    document.getElementById('balSender').textContent = '€ 70,000,000';
+    document.getElementById('balanceStatus').textContent = 'After transfer';
+  }, delays[4] + 400);
+
+  setTimeout(() => {
+    document.getElementById('balReceiver').textContent = '€ 298,500,000';
+  }, delays[5] + 200);
+
+  // Final response
+  const finalDelay = delays[7] + 700;
+  setTimeout(() => {
+    const now = new Date().toISOString();
+    document.getElementById('statusLabel').className = 'status-label s-success';
+    document.getElementById('statusLabel').textContent = 'COMPLETED';
+    document.getElementById('respStatus').style.color = '#4ade80';
+    document.getElementById('respStatus').textContent = '201 CREATED · 4.3s';
+
+    document.getElementById('jsonResponse').innerHTML = `<span class="c">// HTTP 201 Created</span>
+{
+  <span class="k">"id"</span>: <span class="s">"TXN-GE-2025-EUR-250M-001"</span>,
+  <span class="k">"status"</span>: <span class="s">"COMPLETED"</span>,
+  <span class="k">"amount"</span>: <span class="n">250000000.00</span>,
+  <span class="k">"currency"</span>: <span class="s">"EUR"</span>,
+  <span class="k">"sender"</span>: {
+    <span class="k">"ispb"</span>: <span class="s">"GEO-00481400"</span>,
+    <span class="k">"name"</span>: <span class="s">"TBC Bank Georgia"</span>,
+    <span class="k">"account"</span>: <span class="s">"GEO-TBC-MAIN-EUR"</span>,
+    <span class="k">"document"</span>: <span class="s">"GE-204873991"</span>
+  },
+  <span class="k">"receiver"</span>: {
+    <span class="k">"ispb"</span>: <span class="s">"BRA-00000001"</span>,
+    <span class="k">"name"</span>: <span class="s">"IP Bilateral Network"</span>,
+    <span class="k">"account"</span>: <span class="s">"BIL-9900012-X"</span>
+  },
+  <span class="k">"description"</span>: <span class="s">"Bilateral settlement — institutional prefund tranche #1"</span>,
+  <span class="k">"compliance"</span>: {
+    <span class="k">"kyc"</span>: <span class="s">"PASSED"</span>,
+    <span class="k">"aml"</span>: <span class="s">"CLEAR"</span>,
+    <span class="k">"ofac_screened"</span>: <span class="b">true</span>,
+    <span class="k">"limit_check"</span>: <span class="s">"OK"</span>
+  },
+  <span class="k">"audit"</span>: {
+    <span class="k">"block"</span>: <span class="n">8841</span>,
+    <span class="k">"chain_hash"</span>: <span class="s">"a9f3c2d8e1b47f..."</span>
+  },
+  <span class="k">"created_at"</span>: <span class="s">"${now}"</span>,
+  <span class="k">"settled_at"</span>: <span class="s">"${now}"</span>,
+  <span class="k">"webhook_dispatched"</span>: <span class="b">true</span>
+}`;
+
+    document.getElementById('webhookBlock').className = 'webhook-block show';
+    document.getElementById('webhookTs').textContent = `"${now}"`;
+    document.getElementById('auditEntry').className = 'audit-entry show';
+    document.getElementById('auditTs').textContent = now;
+    document.getElementById('auditHash').textContent = 'SHA-256 chain: a9f3c2d8e1b47f0c9a2e5d3b8f1c4e7a2d9b0f3c6e1a8d5b2f9c4e7a0d3b6f1';
+    document.getElementById('btnReset').style.display = 'block';
+  }, finalDelay);
+}
+
+function resetDemo() {
+  steps.forEach((_,i) => setStep(i, ''));
+  document.getElementById('statusLabel').className = 'status-label s-idle';
+  document.getElementById('statusLabel').textContent = 'IDLE';
+  document.getElementById('respStatus').style.color = '#475569';
+  document.getElementById('respStatus').textContent = 'Waiting...';
+  document.getElementById('jsonResponse').innerHTML = '<span class="c">// Execute the transfer to see the response</span>';
+  document.getElementById('webhookBlock').className = 'webhook-block';
+  document.getElementById('auditEntry').className = 'audit-entry';
+  document.getElementById('balSender').textContent = '€ 320,000,000';
+  document.getElementById('balReceiver').textContent = '€ 48,500,000';
+  document.getElementById('balanceStatus').textContent = 'Before transfer';
+  document.getElementById('btnExecute').disabled = false;
+  document.getElementById('btnReset').style.display = 'none';
+}
+</script>
+</body>
+</html>
