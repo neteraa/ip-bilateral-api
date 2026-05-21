@@ -2,6 +2,7 @@ import json
 import os
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,13 @@ class Settings(BaseSettings):
 
     # Banco de dados
     database_url: str = "sqlite+aiosqlite:///./bilateral.db"
+
+    @field_validator("database_url")
+    @classmethod
+    def fix_database_url(cls, v: str) -> str:
+        if v.startswith("postgresql://"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # Chave de admin (protege rotas /admin e /onboarding)
     admin_key: str = "TROCA_ESSA_ADMIN_KEY_AGORA"

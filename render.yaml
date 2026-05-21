@@ -1,3 +1,9 @@
+databases:
+  - name: bilateral-db
+    databaseName: bilateral
+    user: bilateral
+    plan: free
+
 services:
   - type: web
     name: ip-bilateral-api
@@ -16,6 +22,8 @@ services:
       - key: ADMIN_KEY
         generateValue: true
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./bilateral.db
+        fromDatabase:
+          name: bilateral-db
+          property: connectionString
       - key: PEER_WEBHOOK_URL
         value: https://placeholder.com/webhooks
